@@ -8,9 +8,9 @@ import numpy as np
 import mlflow.keras
 import mlflow
 
-ex_name = "demo"
+ex_name = "demo3"
 print("Running mlflow_tracking.py as experiment : ", ex_name)
-mlflow.set_tracking_uri("http://10.192.0.247:5000")
+mlflow.set_tracking_uri("http://10.192.0.182:5000")
 mlflow.set_experiment(ex_name)
 experiment = mlflow.get_experiment_by_name(ex_name)
 
