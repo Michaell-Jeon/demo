@@ -1,0 +1,59 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mlflow-serv-config
+data:
+  ARTIFACTLOC: /bd-fs-mnt/TenantShare/repo/mlflow/artifacts/1
+  RUNID: 675174049d5541f68685f7fb64f5af85
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-mlflow-serv
+  labels:
+    app: demo-mlflow-serv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-mlflow-serv
+  template:
+    metadata:
+      labels:
+        app: demo-mlflow-serv
+        hpecp.hpe.com/fsmount: tiredemo
+    spec:
+      containers:
+      - name: demo-mlflow-serv
+        image: registry.hpe.local:5443/bluedata/mlflow/serving:1.0.2
+        #imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5005
+        resources:
+          requests: 
+            memory: "2Gi"
+            cpu: "1"
+          limits:
+            cpu: "2"
+            memory: "4Gi"
+        envFrom:
+        - configMapRef:
+              name: mlflow-serv-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demo-mlflow-serv-svc
+  labels:
+    app: demo-mlflow-serv
+    hpecp.hpe.com/hpecp-internal-gateway: "true"
+spec:
+  type: NodePort
+  selector:
+    app: demo-mlflow-serv
+  ports:
+    - name: http-demo-mlflow
+      port: 5005
